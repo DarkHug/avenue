@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %} Home Page {% endblock %}
+{% block content %}
+    <div>
+        <div class="container my-5">
+            <h2 class="text-center mb-4">Список Квартир</h2>
+            <div style="border-radius: 15px; overflow: hidden; border: 1px solid #dee2e6;">
+                <table class="table table-striped table-bordered table-hover shadow-sm mb-0">
+                    <thead class="table-dark text-center">
+                    <tr>
+                        <th scope="col">Объект</th>
+                        <th scope="col">Комнаты</th>
+                        <th scope="col">Кв.м</th>
+                        <th scope="col">Этаж</th>
+                        <th scope="col">Пятно</th>
+                        <th scope="col">Отделка</th>
+                        <th scope="col">Сдача</th>
+                        <th scope="col">Цена</th>
+                        <th scope="col">Окна</th>
+                        <th scope="col">Застройщик</th>
+                        <th scope="col">Кол-Во</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for apartment in apartments %}
+                        <tr class="text-center">
+                            <td>{{ apartment.object }}</td>
+                            <td>{{ apartment.room }}</td>
+                            <td>{{ apartment.square_m }}</td>
+                            <td>{{ apartment.floor }} из {{ apartment.max_floor }}</td>
+                            <td>{{ apartment.block }}</td>
+                            <td>{{ apartment.status }}</td>
+                            <td>{{ apartment.completion }}</td>
+                            <td>{{ apartment.price }}</td>
+                            <td>{{ apartment.windows }}</td>
+                            <td>{{ apartment.builder }}</td>
+                            <td>{{ apartment.quantity }}</td>
+                            <td><button type="button" class="btn btn-primary">Зафиксировать</button></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div>
+            <a href="{% url 'apartment_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
+        </div>
+
+    </div>
+{% endblock %}
