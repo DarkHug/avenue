@@ -1,0 +1,20 @@
+<!-- fixation_form.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Фиксация квартиры</h2>
+<p>Квартира: {{ apartment.object }}</p>
+<form method="post" action="{% url 'create_fixation' apartment.unique_id %}">
+    {% csrf_token %}
+    <div>
+        <label for="buyer_name">Имя покупателя:</label>
+        <input type="text" id="buyer_name" name="buyer_name" required>
+    </div>
+    <div>
+
+        <label for="buyer_number">Номер телефона:</label>
+        <input type="tel" id="buyer_number" name="buyer_number" required placeholder="xxx-xxx-xxxx" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+    </div>
+    <button type="submit" class="btn btn-primary">Зафиксировать</button>
+</form>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <!-- Заголовок -->
+        <h1 class="text-center mb-4">Фиксации</h1>
+        <h5 class="text-center mb-4">{{ fixations.apartment }}</h5>
+        <!-- Список фиксаций -->
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                {% if fixations %}
+                    <div class="list-group">
+                        {% for fixation in fixations %}
+                            <div class="list-group-item mb-3 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Покупатель: {{ fixation.buyer.name }}</h6>
+                                        <h6 class="mb-1">Номер: {{ fixation.buyer.number }}</h6>
+                                        <p class="mb-1">{{ fixation.apartment }}</p>
+                                        <p class="mb-1">Менеджер: {{ fixation.user }}</p>
+                                        <p class="mb-1">Зафиксирован: {{ fixation.created_at }}</p>
+                                        <p class="mb-1">Зафиксирован: {{ fixation.expires_at }}</p>
+                                    </div>
+                                    <span class="badge bg-{{ fixation.status|lower }} text-white">
+                                    {{ fixation.status }}
+                                </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center" role="alert">
+                        Нет фиксаций для этой квартиры.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

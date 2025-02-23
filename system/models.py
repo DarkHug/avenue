@@ -1,54 +1,53 @@
-from django.conf import settings
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils import timezone
 
 
 class Apartment(models.Model):
     unique_id = models.AutoField(primary_key=True)
-    object = models.CharField(max_length=255)
-    room = models.IntegerField()
-    square_m = models.FloatField()
-    floor = models.IntegerField()
-    max_floor = models.IntegerField()
-    block = models.CharField(max_length=50)
+    object = models.CharField(verbose_name='Квартира', max_length=255)
+    room = models.IntegerField(verbose_name='Комнат')
+    square_m = models.FloatField(verbose_name='Площадь')
+    floor = models.IntegerField(verbose_name='Этаж')
+    max_floor = models.IntegerField(verbose_name='Макс. Этажей')
+    block = models.CharField(max_length=50, verbose_name='Пятно')
     status = models.CharField(max_length=50)
-    completion = models.DateField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    windows = models.CharField()
-    builder = models.CharField(max_length=50)
-    quantity = models.IntegerField()
+    completion = models.DateField(verbose_name='Отделка')
+    price = models.DecimalField(max_digits=50, decimal_places=2, verbose_name='Цена')
+    windows = models.CharField(max_length=255, verbose_name='Вид')
+    builder = models.CharField(max_length=50, verbose_name='Застройщик')
+    quantity = models.IntegerField(verbose_name='Кол-во')
 
     def __str__(self):
-        return f"{self.object} - {self.unique_id}"
-
-
-class User(models.Model):
-    unique_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255)
-    number = models.CharField(max_length=15)
-    status = models.CharField(max_length=50)
-    role = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
+        return f"Квартира: {self.object}- Пятно: {self.block} - Комнат: {self.room} - Площадь: {self.square_m}, {self.floor}/{self.max_floor} этаж"
 
 
 class Buyer(models.Model):
     unique_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255)
-    number = models.CharField(max_length=15)
+    name = models.CharField(verbose_name='Имя', max_length=255)  # Имя покупателя
+    number = models.CharField(verbose_name='Номер', max_length=15)  # Номер телефона покупателя
 
     def __str__(self):
-        return self.name
+        return f"Покупатель: {self.name}"
 
 
 class Fixation(models.Model):
+
     unique_id = models.AutoField(primary_key=True)
-    apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name="fixations")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="fixations")
-    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, related_name="fixations")
-    created_at = models.DateTimeField(auto_now_add=True)
+    apartment = models.ForeignKey(Apartment, verbose_name='Квартира', on_delete=models.CASCADE,
+                                  related_name="fixations")
+    user = models.ForeignKey(User, verbose_name='Менеджер', on_delete=models.CASCADE, related_name="fixations")
+    buyer = models.ForeignKey(Buyer, verbose_name='Покупатель', on_delete=models.CASCADE, related_name="fixations")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    expires_at = models.DateTimeField(verbose_name='Дата истечения', blank=True, null=True)
     status = models.CharField(max_length=50, default="Pending")
+    prolong_count = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.unique_id:
+            self.expires_at = timezone.now() + timezone.timedelta(days=3)
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
-        return f"Fixation {self.unique_id}: {self.user} -> {self.buyer} -> {self.apartment}"
+        return f"Fixation {self.unique_id}: {self.user.username} -> {self.buyer} -> {self.apartment}"
