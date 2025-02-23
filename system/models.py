@@ -32,6 +32,12 @@ class Buyer(models.Model):
 
 
 class Fixation(models.Model):
+    ACTIVE = "ACTIVE"
+    QUEUE = "QUEUE"
+    STATUS = (
+        (ACTIVE, "АКТИВНЫЙ"),
+        (QUEUE, "В ОЧЕРЕДИ"),
+    )
 
     unique_id = models.AutoField(primary_key=True)
     apartment = models.ForeignKey(Apartment, verbose_name='Квартира', on_delete=models.CASCADE,
@@ -40,14 +46,13 @@ class Fixation(models.Model):
     buyer = models.ForeignKey(Buyer, verbose_name='Покупатель', on_delete=models.CASCADE, related_name="fixations")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     expires_at = models.DateTimeField(verbose_name='Дата истечения', blank=True, null=True)
-    status = models.CharField(max_length=50, default="Pending")
+    status = models.CharField(max_length=50, choices=STATUS, default="QUEUE")
     prolong_count = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if not self.unique_id:
             self.expires_at = timezone.now() + timezone.timedelta(days=3)
         super().save(*args, **kwargs)
-
 
     def __str__(self):
         return f"Fixation {self.unique_id}: {self.user.username} -> {self.buyer} -> {self.apartment}"
