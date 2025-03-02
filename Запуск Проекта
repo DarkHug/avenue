@@ -1,0 +1,4 @@
+1. docker-compose up
+2. celery -A avenue worker -l info -P gevent
+3. celery -A avenue beat -l info
+4. python manage.py runserver

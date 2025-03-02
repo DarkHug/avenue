@@ -2,19 +2,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Фиксация квартиры</h2>
-<p>Квартира: {{ apartment.object }}</p>
-<form method="post" action="{% url 'create_fixation' apartment.unique_id %}">
-    {% csrf_token %}
-    <div>
-        <label for="buyer_name">Имя покупателя:</label>
-        <input type="text" id="buyer_name" name="buyer_name" required>
-    </div>
-    <div>
+    <div class="container mt-5">
+        <!-- Заголовок -->
+        <h1 class="text-center mb-4">Фиксация Клиента</h1>
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <!-- Центрируем текст с названием квартиры -->
+                        <h3 class="card-text text-center">Квартира: {{ apartment.object }}</h3>
 
-        <label for="buyer_number">Номер телефона:</label>
-        <input type="tel" id="buyer_number" name="buyer_number" required placeholder="xxx-xxx-xxxx" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+                        <form method="post" action="{% url 'create_fixation' apartment.unique_id %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="buyer_name">Имя покупателя:</label>
+                                <input type="text" class="form-control" id="buyer_name" name="buyer_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="buyer_number">Номер телефона:</label>
+                                <input type="tel" class="form-control" id="buyer_number" name="buyer_number" required
+                                       placeholder="xxx-xxx-xxxx" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+                            </div>
+                            <!-- Добавляем отступ над кнопкой -->
+                            <div class="mt-4 text-center" >
+                                <button type="submit" class="btn btn-primary btn-block ">Зафиксировать</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary">Зафиксировать</button>
-</form>
 {% endblock %}

@@ -5,35 +5,81 @@
         <!-- Заголовок -->
         <h1 class="text-center mb-4">Фиксации</h1>
         <h5 class="text-center mb-4">{{ fixations.apartment }}</h5>
-        <!-- Список фиксаций -->
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                {% if fixations %}
-                    <div class="list-group">
-                        {% for fixation in fixations %}
-                            <div class="list-group-item mb-3 shadow-sm">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Покупатель: {{ fixation.buyer.name }}</h6>
-                                        <h6 class="mb-1">Номер: {{ fixation.buyer.number }}</h6>
-                                        <p class="mb-1">{{ fixation.apartment }}</p>
-                                        <p class="mb-1">Менеджер: {{ fixation.user }}</p>
-                                        <p class="mb-1">Зафиксирован: {{ fixation.created_at }}</p>
-                                        <p class="mb-1">Зафиксирован: {{ fixation.expires_at }}</p>
-                                    </div>
-                                    <span class="badge bg-{{ fixation.status|lower }} text-white">
-                                    {{ fixation.status }}
-                                </span>
-                                </div>
+
+        {% if fixations %}
+            <div class="row">
+                <!-- Блок для фиксаций со статусом Active -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Активные</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                {% for fixation in fixations %}
+                                    {% if fixation.status == 'ACTIVE' %}
+                                        <div class="list-group-item mb-3 shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="mb-1">Покупатель: {{ fixation.buyer.name }}</h6>
+                                                    <h6 class="mb-1">Номер: {{ fixation.buyer.number }}</h6>
+                                                    <p class="mb-1">{{ fixation.apartment }}</p>
+                                                    <p class="mb-1">Менеджер: {{ fixation.user }}</p>
+                                                    <p class="mb-1">Зафиксирован: {{ fixation.created_at }}</p>
+                                                    <p class="mb-1">Истекает: {{ fixation.expires_at }}</p>
+                                                </div>
+                                                <span class="badge bg-{{ fixation.status|lower }} text-white">
+                                                    {{ fixation.status }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
-                        {% endfor %}
+                        </div>
                     </div>
-                {% else %}
+                </div>
+
+                <!-- Блок для фиксаций со статусом QUEUE -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">Очередь</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                {% for fixation in fixations %}
+                                    {% if fixation.status == 'QUEUE' %}
+                                        <div class="list-group-item mb-3 shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="mb-1">Покупатель: {{ fixation.buyer.name }}</h6>
+                                                    <h6 class="mb-1">Номер: {{ fixation.buyer.number }}</h6>
+                                                    <p class="mb-1">{{ fixation.apartment }}</p>
+                                                    <p class="mb-1">Менеджер: {{ fixation.user }}</p>
+                                                    <p class="mb-1">Зафиксирован: {{ fixation.created_at }}</p>
+                                                    <p class="mb-1">Истекает: {{ fixation.expires_at }}</p>
+                                                </div>
+                                                <span class="badge bg-{{ fixation.status|lower }} text-white">
+                                                    {{ fixation.status }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
                     <div class="alert alert-info text-center" role="alert">
                         Нет фиксаций для этой квартиры.
                     </div>
-                {% endif %}
+                </div>
             </div>
-        </div>
+        {% endif %}
     </div>
 {% endblock %}

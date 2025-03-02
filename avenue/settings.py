@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+from celery.schedules import crontab
 
 from pathlib import Path
 
@@ -32,6 +33,9 @@ LOGOUT_REDIRECT_URL = '/'
 
 INSTALLED_APPS = [
     'jazzmin',
+    'django_celery_beat',
+    'django_celery_results',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -176,4 +180,22 @@ JAZZMIN_UI_TWEAKS = {
         'success': 'btn-success',
     },
     'actions_sticky_top': True,
+}
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Almaty'
+
+
+CELERY_BEAT_SCHEDULE = {
+    'check-and-delete-expired-fixations': {
+        'task': 'system.tasks.check_and_delete_expired_fixations',
+        'schedule': crontab(minute='*/1'),  # Запуск каждые 15 минут
+        # Можно настроить другие интервалы:
+        # 'schedule': crontab(hour='*/1'),  # Каждый час
+        # 'schedule': crontab(minute=0, hour='*/3'),  # Каждые 3 часа
+        # 'schedule': crontab(minute=0, hour=0),  # Ежедневно в полночь
+    },
 }

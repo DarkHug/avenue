@@ -83,11 +83,16 @@ def create_fixation(request, apartment_id):
             number=buyer_number,
         )
 
+        status = "ACTIVE"
+
+        if apartment.fixations.count() >= 3:
+            status = "QUEUE"
+
         fixation = Fixation.objects.create(
             apartment=apartment,
             user=request.user,
             buyer=buyer,
-            status="Pending",
+            status=status,
         )
 
         return redirect('home')
@@ -125,3 +130,5 @@ def prolong_fixations(request, fixation_id):
     fixation.prolong_count += 1
     fixation.save()
     return redirect('my_fixations')
+
+
