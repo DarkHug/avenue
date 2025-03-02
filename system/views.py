@@ -66,17 +66,28 @@ def fixation_form(request, apartment_id):
 
 @login_required
 def create_fixation(request, apartment_id):
-    apartment = get_object_or_404(Apartment, pk=apartment_id)
+    apartment = get_object_or_404(Apartment, id=apartment_id)
+
+    # Проверка на количество фиксаций пользователя
     fixation_count = Fixation.objects.filter(apartment=apartment, user=request.user).count()
     print(fixation_count)
     if fixation_count >= 2:
-        messages.error(request,
-                       f'У вас уже максимум фиксаций')
+        messages.error(request, f'У вас уже максимум фиксаций')
         return redirect('home')
 
     if request.method == 'POST':
         buyer_name = request.POST.get('buyer_name')
         buyer_number = request.POST.get('buyer_number')
+
+        # Проверяем, существует ли такой покупатель
+        existing_buyer = Buyer.objects.filter(number=buyer_number).first()
+
+        # Если покупатель существует, проверяем, есть ли уже фиксация с этим покупателем на данную квартиру
+        if existing_buyer:
+            existing_fixation = Fixation.objects.filter(apartment=apartment, buyer=existing_buyer).exists()
+            if existing_fixation:
+                messages.error(request, f'Этот покупатель уже зафиксирован на данную квартиру')
+                return redirect('home')
 
         buyer, created = Buyer.objects.get_or_create(
             name=buyer_name,
@@ -85,7 +96,9 @@ def create_fixation(request, apartment_id):
 
         status = "ACTIVE"
 
-        if apartment.fixations.count() >= 3:
+        active_fixations_count = apartment.fixations.filter(status="ACTIVE").count()
+
+        if active_fixations_count >= 3:
             status = "QUEUE"
 
         fixation = Fixation.objects.create(
@@ -102,7 +115,7 @@ def create_fixation(request, apartment_id):
 
 @login_required
 def apartment_fixations(request, apartment_id):
-    apartment = get_object_or_404(Apartment, pk=apartment_id)
+    apartment = get_object_or_404(Apartment, id=apartment_id)
     fixations = Fixation.objects.filter(apartment=apartment)
     return render(request, 'apartment_fixations.html', context={'fixations': fixations, 'apartment': apartment})
 
@@ -130,5 +143,3 @@ def prolong_fixations(request, fixation_id):
     fixation.prolong_count += 1
     fixation.save()
     return redirect('my_fixations')
-
-

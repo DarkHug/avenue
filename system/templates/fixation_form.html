@@ -12,7 +12,7 @@
                         <!-- Центрируем текст с названием квартиры -->
                         <h3 class="card-text text-center">Квартира: {{ apartment.object }}</h3>
 
-                        <form method="post" action="{% url 'create_fixation' apartment.unique_id %}">
+                        <form method="post" action="{% url 'create_fixation' apartment.id %}">
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="buyer_name">Имя покупателя:</label>

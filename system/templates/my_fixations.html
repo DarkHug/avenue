@@ -32,8 +32,8 @@
                                         <p class="mb-1">Менеджер: {{ fixation.user }}</p>
                                         <p class="mb-1">Зафиксирован: {{ fixation.created_at }}</p>
                                         <p class="mb-1">Истекает: {{ fixation.expires_at }}</p>
-                                        <a href="{% url 'delete_fixation' fixation.unique_id %}" class="btn btn-danger">Удалить </a>
-                                        <a href="{% url 'prolong_fixation' fixation.unique_id %}"
+                                        <a href="{% url 'delete_fixation' fixation.id %}" class="btn btn-danger">Удалить </a>
+                                        <a href="{% url 'prolong_fixation' fixation.id %}"
                                            class="btn btn-success">Продлить </a>
                                     </div>
                                 </div>

@@ -48,16 +48,16 @@
                             <td>{{ apartment.price }}</td>
                             <td>{{ apartment.windows }}</td>
                             <td>{{ apartment.builder }}</td>
-                            <td>{{ apartment.quantity }}</td>
+{#                            <td>{{ apartment.quantity }}</td>#}
                             <td>
                                 {% if apartment.fixation_count < apartment.quantity %}
-                                    <a href="{% url 'fixation_form' apartment.unique_id %}" class="btn btn-primary">Зафиксировать</a>
+                                    <a href="{% url 'fixation_form' apartment.id %}" class="btn btn-primary">Зафиксировать</a>
                                 {% else %}
                                     <button class="btn btn-secondary" disabled>Зафиксировано</button>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'apartment_fixations' apartment.unique_id %}" class="btn btn-primary">Фиксации</a>
+                                <a href="{% url 'apartment_fixations' apartment.id %}" class="btn btn-primary">Фиксации</a>
                             </td>
                         </tr>
                     {% endfor %}

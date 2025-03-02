@@ -3,8 +3,17 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
+class Debt(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, verbose_name='Менеджер', on_delete=models.CASCADE, related_name="debts")
+    amount = models.DecimalField
+
+    def __str__(self):
+        return f"Долг менеджера {self.user.username} составляет: {self.amount}"
+
+
 class Apartment(models.Model):
-    unique_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     object = models.CharField(verbose_name='Квартира', max_length=255)
     room = models.IntegerField(verbose_name='Комнат')
     square_m = models.FloatField(verbose_name='Площадь')
@@ -23,7 +32,7 @@ class Apartment(models.Model):
 
 
 class Buyer(models.Model):
-    unique_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(verbose_name='Имя', max_length=255)  # Имя покупателя
     number = models.CharField(verbose_name='Номер', max_length=15)  # Номер телефона покупателя
 
@@ -39,7 +48,7 @@ class Fixation(models.Model):
         (QUEUE, "В ОЧЕРЕДИ"),
     )
 
-    unique_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     apartment = models.ForeignKey(Apartment, verbose_name='Квартира', on_delete=models.CASCADE,
                                   related_name="fixations")
     user = models.ForeignKey(User, verbose_name='Менеджер', on_delete=models.CASCADE, related_name="fixations")
@@ -50,9 +59,9 @@ class Fixation(models.Model):
     prolong_count = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
-        if not self.unique_id:
+        if not self.id:
             self.expires_at = timezone.now() + timezone.timedelta(days=3)
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Fixation {self.unique_id}: {self.user.username} -> {self.buyer} -> {self.apartment}"
+        return f"Fixation {self.id}: {self.user.username} -> {self.buyer} -> {self.apartment}"
