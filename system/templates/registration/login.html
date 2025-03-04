@@ -1,12 +1,159 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="container">
-    <h2>Login</h2>
-    <form method="POST">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn btn-primary">Login</button>
-    </form>
-  </div>
+<style>
+    body {
+        background-color: #d9edf7;
+        font-family: 'Montserrat', 'Roboto', sans-serif;
+    }
+
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 85vh;
+        padding: 20px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 420px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: none;
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, #5a8d9b, #3a6c7a);
+        color: white;
+        padding: 25px 20px;
+        text-align: center;
+        border-bottom: none;
+    }
+
+    .login-header h2 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 26px;
+        letter-spacing: 0.5px;
+    }
+
+    .login-body {
+        padding: 30px;
+        background-color: white;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        background-color: #f8f9fa;
+        font-size: 15px;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(90, 141, 155, 0.25);
+        border-color: #5a8d9b;
+        background-color: white;
+        outline: none;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #5a8d9b;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 6px rgba(90, 141, 155, 0.2);
+    }
+
+    .login-btn:hover {
+        background-color: #4a7a86;
+    }
+
+    .help-text {
+        margin-top: 20px;
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .help-text a {
+        color: #5a8d9b;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .help-text a:hover {
+        text-decoration: underline;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="login-container">
+    <div class="card login-card">
+        <div class="card-header login-header">
+            <h2>Вход в систему</h2>
+        </div>
+        <div class="card-body login-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="error-message">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger mb-3">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <button type="submit" class="btn login-btn">Войти</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add Bootstrap classes to form elements
+    document.addEventListener('DOMContentLoaded', function() {
+        const formControls = document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"]');
+        formControls.forEach(element => {
+            element.classList.add('form-control');
+        });
+    });
+</script>
 {% endblock %}

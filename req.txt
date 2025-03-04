@@ -21,7 +21,7 @@ greenlet==3.1.1
 kombu==5.4.2
 prometheus_client==0.21.1
 prompt_toolkit==3.0.50
-psycopg2==2.9.10
+psycopg2-binary==2.9.10
 pycparser==2.22
 python-crontab==3.2.0
 python-dateutil==2.9.0.post0

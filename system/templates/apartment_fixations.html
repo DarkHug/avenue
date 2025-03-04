@@ -1,73 +1,208 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container mt-5">
+    <style>
+        body {
+            background-color: #d9edf7;
+            font-family: 'Montserrat', 'Roboto', sans-serif;
+        }
+
+        .page-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .apartment-subtitle {
+            color: #5a8d9b;
+            font-size: 18px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: none;
+        }
+
+        .card-header h5 {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .active-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .queue-header {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .card-body {
+            padding: 20px;
+            background-color: white;
+        }
+
+        .fixation-item {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #5a8d9b;
+            transition: all 0.2s ease;
+        }
+
+        .fixation-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .fixation-active {
+            border-left-color: #28a745;
+        }
+
+        .fixation-queue {
+            border-left-color: #ffc107;
+        }
+
+        .buyer-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .buyer-number {
+            font-weight: 500;
+            color: #5a8d9b;
+            margin-bottom: 5px;
+        }
+
+        .fixation-detail {
+            margin-bottom: 4px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .fixation-date {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+
+        .badge-active {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-queue {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .empty-alert {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+            color: #5a8d9b;
+        }
+    </style>
+
+    <div class="container mt-5 mb-5">
         <!-- Заголовок -->
-        <h1 class="text-center mb-4">Фиксации</h1>
-        <h5 class="text-center mb-4">{{ fixations.apartment }}</h5>
+        <h1 class="page-title">Фиксации</h1>
+        <h5 class="apartment-subtitle">{{ fixations.apartment }}</h5>
 
         {% if fixations %}
             <div class="row">
                 <!-- Блок для фиксаций со статусом Active -->
                 <div class="col-md-6">
-                    <div class="card mb-4">
-                        <div class="card-header bg-success text-white">
+                    <div class="card">
+                        <div class="card-header active-header">
                             <h5 class="mb-0">Активные</h5>
                         </div>
                         <div class="card-body">
-                            <div class="list-group">
-                                {% for fixation in fixations %}
-                                    {% if fixation.status == 'ACTIVE' %}
-                                        <div class="list-group-item mb-3 shadow-sm">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <h6 class="mb-1">Покупатель: {{ fixation.buyer.name }}</h6>
-                                                    <h6 class="mb-1">Номер: {{ fixation.buyer.number }}</h6>
-                                                    <p class="mb-1">{{ fixation.apartment }}</p>
-                                                    <p class="mb-1">Менеджер: {{ fixation.user }}</p>
-                                                    <p class="mb-1">Зафиксирован: {{ fixation.created_at }}</p>
-                                                    <p class="mb-1">Истекает: {{ fixation.expires_at }}</p>
-                                                </div>
-                                                <span class="badge bg-{{ fixation.status|lower }} text-white">
-                                                    {{ fixation.status }}
-                                                </span>
+                            {% for fixation in fixations %}
+                                {% if fixation.status == 'ACTIVE' %}
+                                    <div class="fixation-item fixation-active">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="buyer-name">{{ fixation.buyer.name }}</div>
+                                                <div class="buyer-number">Тел: {{ fixation.buyer.number }}</div>
+                                                <div class="fixation-detail">Объект: {{ fixation.apartment }}</div>
+                                                <div class="fixation-detail">Менеджер: {{ fixation.user }}</div>
+                                                <div class="fixation-detail">Зафиксирован: <span class="fixation-date">{{ fixation.created_at|date:"d.m.Y H:i" }}</span></div>
+                                                <div class="fixation-detail">Истекает: <span class="fixation-date">{{ fixation.expires_at|date:"d.m.Y H:i" }}</span></div>
                                             </div>
+                                            <span class="status-badge badge-active">
+                                                АКТИВНО
+                                            </span>
                                         </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
+                                    </div>
+                                {% endif %}
+                            {% empty %}
+                                <div class="text-center text-muted py-3">
+                                    <i class="bi bi-info-circle me-2"></i>Нет активных фиксаций
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
 
                 <!-- Блок для фиксаций со статусом QUEUE -->
                 <div class="col-md-6">
-                    <div class="card mb-4">
-                        <div class="card-header bg-warning text-dark">
+                    <div class="card">
+                        <div class="card-header queue-header">
                             <h5 class="mb-0">Очередь</h5>
                         </div>
                         <div class="card-body">
-                            <div class="list-group">
-                                {% for fixation in fixations %}
-                                    {% if fixation.status == 'QUEUE' %}
-                                        <div class="list-group-item mb-3 shadow-sm">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <h6 class="mb-1">Покупатель: {{ fixation.buyer.name }}</h6>
-                                                    <h6 class="mb-1">Номер: {{ fixation.buyer.number }}</h6>
-                                                    <p class="mb-1">{{ fixation.apartment }}</p>
-                                                    <p class="mb-1">Менеджер: {{ fixation.user }}</p>
-                                                    <p class="mb-1">Зафиксирован: {{ fixation.created_at }}</p>
-                                                    <p class="mb-1">Истекает: {{ fixation.expires_at }}</p>
-                                                </div>
-                                                <span class="badge bg-{{ fixation.status|lower }} text-white">
-                                                    {{ fixation.status }}
-                                                </span>
+                            {% for fixation in fixations %}
+                                {% if fixation.status == 'QUEUE' %}
+                                    <div class="fixation-item fixation-queue">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="buyer-name">{{ fixation.buyer.name }}</div>
+                                                <div class="buyer-number">Тел: {{ fixation.buyer.number }}</div>
+                                                <div class="fixation-detail">Объект: {{ fixation.apartment }}</div>
+                                                <div class="fixation-detail">Менеджер: {{ fixation.user }}</div>
+                                                <div class="fixation-detail">Зафиксирован: <span class="fixation-date">{{ fixation.created_at|date:"d.m.Y H:i" }}</span></div>
+                                                <div class="fixation-detail">Истекает: <span class="fixation-date">{{ fixation.expires_at|date:"d.m.Y H:i" }}</span></div>
                                             </div>
+                                            <span class="status-badge badge-queue">
+                                                ОЧЕРЕДЬ
+                                            </span>
                                         </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
+                                    </div>
+                                {% endif %}
+                            {% empty %}
+                                <div class="text-center text-muted py-3">
+                                    <i class="bi bi-info-circle me-2"></i>Нет фиксаций в очереди
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -75,11 +210,18 @@
         {% else %}
             <div class="row">
                 <div class="col-md-8 offset-md-2">
-                    <div class="alert alert-info text-center" role="alert">
+                    <div class="empty-alert text-center py-4">
+                        <i class="bi bi-info-circle me-2"></i>
                         Нет фиксаций для этой квартиры.
                     </div>
                 </div>
             </div>
         {% endif %}
+
+        <div class="d-flex justify-content-center mt-4">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left me-1"></i> Вернуться к списку
+            </a>
+        </div>
     </div>
 {% endblock %}

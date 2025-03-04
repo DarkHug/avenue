@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import Apartment, User, Buyer, Fixation
+
+
 # from django_apscheduler.models import DjangoJob, DjangoJobExecution
 
 
@@ -15,4 +17,4 @@ class BuyerAdmin(admin.ModelAdmin):
 
 @admin.register(Apartment)
 class ApartmentAdmin(admin.ModelAdmin):
-    list_display = ('object', 'room', 'square_m', 'floor', 'block', 'price', 'builder')
+    list_display = ('object', 'room', 'square_m', 'floor', 'block', 'completion', 'price', 'builder')

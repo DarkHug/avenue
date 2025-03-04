@@ -2,3 +2,9 @@
 2. celery -A avenue worker -l info -P gevent
 3. celery -A avenue beat -l info
 4. python manage.py runserver
+
+<div class="logo-container">
+                <a class="navbar-brand" href="#">
+                    <img src="{% static 'logo.png' %}" alt="Logo" height="30">
+                </a>
+            </div>

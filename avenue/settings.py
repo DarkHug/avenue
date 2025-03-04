@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-amkdil%d*u5v1ae28liej!l1k-^k77(80nfslgpgi9-t-99zp0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 LOGIN_URL = 'login/'
@@ -154,9 +154,9 @@ JAZZMIN_UI_TWEAKS = {
     'footer_small_text': False,
     'body_small_text': False,
     'brand_small_text': False,
-    'brand_colour': 'navbar-cyan',
+    'brand_colour': 'navbar-black',
     'accent': 'accent-navy',
-    'navbar': 'navbar-cyan navbar-dark',
+    'navbar': 'navbar-dark',
     'no_navbar_border': True,
     'navbar_fixed': True,
     'layout_boxed': False,
@@ -168,7 +168,7 @@ JAZZMIN_UI_TWEAKS = {
     'sidebar_nav_child_indent': True,
     'sidebar_nav_compact_style': True,
     'sidebar_nav_legacy_style': False,
-    'sidebar_nav_flat_style': False,
+    'sidebar_nav_flat_style': True,
     'theme': 'united',
     'dark_mode_theme': None,
     'button_classes': {
@@ -188,7 +188,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Almaty'
 
-
 CELERY_BEAT_SCHEDULE = {
     'check-and-delete-expired-fixations': {
         'task': 'system.tasks.check_and_delete_expired_fixations',
@@ -199,3 +198,5 @@ CELERY_BEAT_SCHEDULE = {
         # 'schedule': crontab(minute=0, hour=0),  # Ежедневно в полночь
     },
 }
+
+CSRF_TRUSTED_ORIGINS = ["https://fcd8-91-147-91-79.ngrok-free.app"]

@@ -10,6 +10,8 @@ from .forms import ApartmentForm
 from .models import Apartment, Fixation, Buyer
 
 
+# ---------------------Login Section---------------------
+
 def signup_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -45,6 +47,9 @@ def home(request):
     return render(request, 'home.html', {'apartments': apartments})
 
 
+# ---------------------Apartment Section---------------------
+
+
 def apartment_new(request):
     if request.method == 'POST':
         form = ApartmentForm(request.POST)
@@ -57,6 +62,33 @@ def apartment_new(request):
     return render(request, 'new_apartment.html', {'form': form})
 
 
+def all_apartments(request):
+    apartments = Apartment.objects.all()
+    return render(request, 'all_apartments.html', context={'apartments': apartments})
+
+
+def apartment_edit(request, pk):
+    apartment = get_object_or_404(Apartment, pk=pk)
+
+    if request.method == "POST":
+        form = ApartmentForm(request.POST, instance=apartment)
+        if form.is_valid():
+            apartment = form.save()
+            messages.success(request, f"Объект '{apartment.object}' успешно обновлен")
+            return redirect('all_apartment')
+    else:
+        form = ApartmentForm(instance=apartment)
+
+    return render(request, 'apartment_edit.html', {'form': form, 'apartment': apartment})
+
+
+def apartment_delete(request, pk):
+    apartment = get_object_or_404(Apartment, pk=pk)
+    apartment.delete()
+    return redirect('all_apartment')
+
+
+# ---------------------Fixation Section---------------------
 @login_required
 def fixation_form(request, apartment_id):
     # Получаем квартиру по ID
@@ -138,8 +170,14 @@ def prolong_fixations(request, fixation_id):
     fixation = get_object_or_404(Fixation, pk=fixation_id)
     if fixation.prolong_count >= 1:
         messages.error(request, f'Уже продлевали, нельзя больше')
-        return redirect('my_fixations')
+        return redirect('all_fixations')
     fixation.expires_at += timezone.timedelta(days=3)
     fixation.prolong_count += 1
     fixation.save()
-    return redirect('my_fixations')
+    return redirect('all_fixations')
+
+
+@login_required
+def all_fixations(request):
+    fixations = Fixation.objects.all().order_by('user__username')  # Сортировка по имени менеджера
+    return render(request, 'all_fixations.html', {'fixations': fixations})

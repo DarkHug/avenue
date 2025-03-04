@@ -2,6 +2,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <style>
+        body {
+            background-color: #d9edf7;
+        }
+
+    </style>
     <div class="container mt-5">
         <!-- Заголовок -->
         <h1 class="text-center mb-4">Фиксация Клиента</h1>
@@ -24,8 +30,8 @@
                                        placeholder="xxx-xxx-xxxx" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
                             </div>
                             <!-- Добавляем отступ над кнопкой -->
-                            <div class="mt-4 text-center" >
-                                <button type="submit" class="btn btn-primary btn-block ">Зафиксировать</button>
+                            <div class="mt-4 text-center">
+                                <button type="submit" class="btn btn-success btn-block ">Зафиксировать</button>
                             </div>
                         </form>
                     </div>

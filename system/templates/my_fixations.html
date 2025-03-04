@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <style>
+        body {
+            background-color: #d9edf7;
+        }
+
+    </style>
     <div class="container mt-5">
         <!-- Заголовок -->
         <h1 class="text-center mb-4">Фиксации</h1>
@@ -33,15 +39,13 @@
                                         <p class="mb-1">Зафиксирован: {{ fixation.created_at }}</p>
                                         <p class="mb-1">Истекает: {{ fixation.expires_at }}</p>
                                         <a href="{% url 'delete_fixation' fixation.id %}" class="btn btn-danger">Удалить </a>
-                                        <a href="{% url 'prolong_fixation' fixation.id %}"
-                                           class="btn btn-success">Продлить </a>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="alert alert-info text-center" role="alert">
+                    <div class="alert alert-dark text-center" role="alert">
                         Нет фиксаций
                     </div>
                 {% endif %}

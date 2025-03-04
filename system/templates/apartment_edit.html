@@ -1,42 +1,47 @@
 {% extends 'base.html' %}
+{% block title %}Редактирование объекта{% endblock %}
 
 {% block content %}
 <style>
     body {
         background-color: #d9edf7;
+        font-family: 'Montserrat', 'Roboto', sans-serif;
     }
-
+    
+    .page-title {
+        color: #2c3e50;
+        font-size: 28px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 600;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
     .form-card {
         border-radius: 15px;
         overflow: hidden;
         border: none;
-        transition: all 0.3s ease;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
     }
-
+    
     .form-header {
-        background-color: #5a8d9b;
+        background: linear-gradient(135deg, #5a8d9b, #3a6c7a);
         color: white;
         padding: 20px;
         border-bottom: none;
     }
-
-    .form-header h3 {
-        margin: 0;
-        font-weight: 600;
-        font-size: 24px;
-    }
-
+    
     .form-body {
         padding: 25px 30px;
         background-color: white;
     }
-
+    
     .form-label {
         font-weight: 500;
         color: #2c3e50;
         margin-bottom: 5px;
     }
-
+    
     .form-control {
         border-radius: 8px;
         padding: 8px 12px;
@@ -44,48 +49,52 @@
         background-color: #f8f9fa;
         transition: all 0.2s ease;
     }
-
+    
     .form-control:focus {
         box-shadow: 0 0 0 3px rgba(90, 141, 155, 0.25);
         border-color: #5a8d9b;
         background-color: white;
     }
-
+    
     .form-select {
         border-radius: 8px;
         height: 38px;
         border: 1px solid #e0e0e0;
         background-color: #f8f9fa;
     }
-
+    
     .submit-btn {
         background-color: #5a8d9b;
         border: none;
         border-radius: 8px;
-        padding: 12px 30px;
+        padding: 10px 25px;
         font-weight: 600;
         letter-spacing: 0.5px;
-        box-shadow: 0 4px 6px rgba(90, 141, 155, 0.2);
-        transition: all 0.2s ease;
+        color: white;
     }
-
+    
     .submit-btn:hover {
         background-color: #4a7a86;
-        transform: translateY(-1px);
     }
-
+    
+    .cancel-btn {
+        border-radius: 8px;
+        padding: 10px 25px;
+        font-weight: 500;
+    }
+    
     .invalid-feedback {
         color: #dc3545;
         font-size: 14px;
         margin-top: 5px;
     }
-
+    
     /* Fix for Django form rendering */
     input, select, textarea {
         width: 100% !important;
         max-width: 100% !important;
     }
-
+    
     /* Fix for checkboxes */
     input[type="checkbox"] {
         width: auto !important;
@@ -96,7 +105,8 @@
 <div class="container d-flex justify-content-center align-items-center" style="padding: 40px 0;">
     <div class="card shadow-lg form-card" style="width: 100%; max-width: 700px;">
         <div class="card-header text-center form-header">
-            <h3>Добавить объект</h3>
+            <h3>Редактирование объекта</h3>
+            <div class="text-white-50">{{ apartment.object }}</div>
         </div>
         <div class="card-body form-body">
             <form method="POST">
@@ -122,8 +132,8 @@
                     {% endfor %}
                 </div>
                 <div class="d-flex justify-content-between mt-4">
-                    <a href="{% url 'home' %}" class="btn btn-outline-secondary">Отмена</a>
-                    <button type="submit" class="btn btn-primary submit-btn">Сохранить</button>
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary cancel-btn">Отмена</a>
+                    <button type="submit" class="btn submit-btn">Сохранить изменения</button>
                 </div>
             </form>
         </div>

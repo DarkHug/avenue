@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+import json
+
 
 class Debt(models.Model):
     id = models.AutoField(primary_key=True)
@@ -21,7 +23,7 @@ class Apartment(models.Model):
     max_floor = models.IntegerField(verbose_name='Макс. Этажей')
     block = models.CharField(max_length=50, verbose_name='Пятно')
     status = models.CharField(max_length=50)
-    completion = models.DateField(verbose_name='Отделка')
+    completion = models.CharField(verbose_name='Сдача')
     price = models.DecimalField(max_digits=50, decimal_places=2, verbose_name='Цена')
     windows = models.CharField(max_length=255, verbose_name='Вид')
     builder = models.CharField(max_length=50, verbose_name='Застройщик')
@@ -38,6 +40,20 @@ class Buyer(models.Model):
 
     def __str__(self):
         return f"Покупатель: {self.name}"
+
+
+class FixationLog(models.Model):
+    id = models.AutoField(primary_key=True)
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    data = models.JSONField(verbose_name='Данные')
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name = 'Лог фиксации'
+        verbose_name_plural = 'Логи фиксаций'
+
+    def __str__(self):
+        return f"Log {self.id}: {self.timestamp}"
 
 
 class Fixation(models.Model):
