@@ -163,6 +163,89 @@
         .progress {
             vertical-align: middle;
         }
+
+        /* Мобильная адаптация */
+        @media (max-width: 991px) {
+            .table-container {
+                display: block;
+                width: 100%;
+                padding: 15px;
+                overflow-x: auto;
+            }
+
+            .custom-table {
+                min-width: 100%;
+            }
+
+            /* Скрыть таблицу на мобильных */
+            .desktop-table {
+                display: none;
+            }
+
+            /* Показать карточки на мобильных */
+            .mobile-cards {
+                display: block;
+            }
+
+            .apartment-card {
+                background-color: #ecf5f9;
+                border-radius: 12px;
+                margin-bottom: 15px;
+                padding: 15px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            .apartment-card-header {
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .apartment-card-title {
+                font-weight: 600;
+                font-size: 16px;
+                color: #2c3e50;
+            }
+
+            .apartment-card-body {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .apartment-card-item {
+                margin-bottom: 8px;
+            }
+
+            .apartment-card-label {
+                font-size: 13px;
+                color: #6c757d;
+                display: block;
+            }
+
+            .apartment-card-value {
+                font-size: 15px;
+                font-weight: 500;
+                color: #2c3e50;
+            }
+
+            .apartment-card-actions {
+                margin-top: 15px;
+                display: flex;
+                justify-content: space-between;
+                border-top: 1px solid rgba(0, 0, 0, 0.1);
+                padding-top: 12px;
+            }
+
+            .apartment-card-actions .action-btn {
+                flex: 1;
+                margin: 0 5px;
+                text-align: center;
+            }
+        }
     </style>
 
     <div class="container text-center" style="padding-top: 50px; padding-bottom: 70px;">
@@ -181,8 +264,9 @@
 
         <h1 class="page-title">Квартиры</h1>
 
-        <div class="table-container" style="overflow: hidden; margin: 0 auto; text-align: left;">
-            <div class="table-responsive" style="overflow-x: visible;">
+        <div class="table-container" style="margin: 0 auto; text-align: left;">
+            <!-- Десктопная версия (таблица) -->
+            <div class="table-responsive desktop-table d-none d-lg-block">
                 <table class="table custom-table">
                     <thead>
                     <tr>
@@ -246,8 +330,79 @@
                 </table>
             </div>
 
-            <div style="clear: both;"></div>
+            <!-- Мобильная версия (карточки) -->
+            <div class="mobile-cards d-block d-lg-none">
+                {% for apartment in apartments %}
+                    <div class="apartment-card">
+                        <div class="apartment-card-header">
+                            <div class="apartment-card-title">{{ apartment.object }}</div>
+                            <span class="badge-rooms">{{ apartment.room }}</span>
+                        </div>
+                        <div class="apartment-card-body">
+                            <div class="apartment-card-item">
+                                <span class="apartment-card-label">Площадь</span>
+                                <span class="apartment-card-value badge-area">{{ apartment.square_m }} м²</span>
+                            </div>
+                            <div class="apartment-card-item">
+                                <span class="apartment-card-label">Этаж</span>
+                                <span class="apartment-card-value">{{ apartment.floor }} из {{ apartment.max_floor }}</span>
+                            </div>
+                            <div class="apartment-card-item">
+                                <span class="apartment-card-label">Пятно</span>
+                                <span class="apartment-card-value">{{ apartment.block }}</span>
+                            </div>
+                            <div class="apartment-card-item">
+                                <span class="apartment-card-label">Отделка</span>
+                                <span class="apartment-card-value">{{ apartment.status }}</span>
+                            </div>
+                            <div class="apartment-card-item">
+                                <span class="apartment-card-label">Сдача</span>
+                                <span class="apartment-card-value badge-finish">{{ apartment.completion|date:"Y" }}</span>
+                            </div>
+                            <div class="apartment-card-item">
+                                <span class="apartment-card-label">Окна</span>
+                                <span class="apartment-card-value">{{ apartment.windows }}</span>
+                            </div>
+                        </div>
+                        <div class="apartment-card-item" style="margin-top: 10px;">
+                            <span class="apartment-card-label">Застройщик</span>
+                            <span class="apartment-card-value">{{ apartment.builder }}</span>
+                        </div>
+                        <div class="apartment-card-item" style="margin-top: 10px;">
+                            <span class="apartment-card-label">Цена</span>
+                            <span class="apartment-card-value price-column">
+                                {% with price_str=apartment.price|stringformat:"s" %}
+                                    {% if price_str|length > 9 %}
+                                        {{ price_str|slice:":-9" }} {{ price_str|slice:"-9:-6" }}
+                                        {{ price_str|slice:"-6:-3" }} {{ price_str|slice:"-3:" }}
+                                    {% elif price_str|length > 6 %}
+                                        {{ price_str|slice:":-6" }} {{ price_str|slice:"-6:-3" }}
+                                        {{ price_str|slice:"-3:" }}
+                                    {% elif price_str|length > 3 %}
+                                        {{ price_str|slice:":-3" }} {{ price_str|slice:"-3:" }}
+                                    {% else %}
+                                        {{ price_str }}
+                                    {% endif %}
+                                {% endwith %}
+                            </span>
+                        </div>
+                        <div class="apartment-card-actions">
+                            {% if apartment.fixation_count < apartment.quantity %}
+                                <a href="{% url 'fixation_form' apartment.id %}"
+                                   class="action-btn">Зафиксировать</a>
+                            {% else %}
+                                <button class="action-btn"
+                                        style="background-color: rgba(108, 117, 125, 0.2); color: #6c757d;"
+                                        disabled>Зафиксировано
+                                </button>
+                            {% endif %}
+                            <a href="{% url 'apartment_fixations' apartment.id %}" class="action-btn">Фиксации</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
 
+            <div style="clear: both;"></div>
         </div>
     </div>
 {% endblock %}
