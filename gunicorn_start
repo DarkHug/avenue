@@ -1,0 +1,33 @@
+#!/bin/bash
+
+NAME="avenue"
+DIR=/home/ubuntu/avenue
+USER=ubuntu
+GROUP=ubuntu
+WORKERS=3
+BIND=unix:/home/ubuntu/avenue/avenue.sock
+DJANGO_SETTINGS_MODULE=avenue.settings
+DJANGO_WSGI_MODULE=avenue.wsgi
+VENV_PATH=/home/ubuntu/avenue/venv
+
+cd $DIR
+source $VENV_PATH/bin/activate
+
+export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+export PYTHONPATH=$DIR:$PYTHONPATH
+
+echo "Starting $NAME as `whoami`"
+echo "Working directory: $DIR"
+echo "Using Python: `which python`"
+echo "Using Gunicorn: `which gunicorn`"
+echo "Settings module: $DJANGO_SETTINGS_MODULE"
+echo "WSGI module: $DJANGO_WSGI_MODULE"
+
+exec $VENV_PATH/bin/gunicorn $DJANGO_WSGI_MODULE:application \
+  --name $NAME \
+  --workers $WORKERS \
+  --user=$USER \
+  --group=$GROUP \
+  --bind=$BIND \
+  --log-level=debug
+
