@@ -2,15 +2,21 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.db.models import Count
+from django.db.models import Count, F
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from .forms import ApartmentForm
-from .models import Apartment, Fixation, Buyer
+from .models import Apartment, Fixation, FixationHistory, Buyer, Debt, CoolingPeriod
 
 
-# ---------------------Login Section---------------------
+# ---------------------Login & Profile Section---------------------
+
+@login_required
+def profile(request):
+    user = request.user
+    pass
+
 
 def signup_view(request):
     if request.method == 'POST':
@@ -99,12 +105,24 @@ def fixation_form(request, apartment_id):
 @login_required
 def create_fixation(request, apartment_id):
     apartment = get_object_or_404(Apartment, id=apartment_id)
-
     # Проверка на количество фиксаций пользователя
     fixation_count = Fixation.objects.filter(apartment=apartment, user=request.user).count()
     print(fixation_count)
     if fixation_count >= 2:
         messages.error(request, f'У вас уже максимум фиксаций')
+        return redirect('home')
+
+    # Проверка на период охлаждения
+    cooling_period = CoolingPeriod.objects.filter(
+        user=request.user,
+        apartment=apartment,
+        end_date__gt=timezone.now()
+    ).first()
+
+    if cooling_period:
+        days_left = (cooling_period.end_date - timezone.now()).days + 1
+        messages.error(request,
+                       f"Вы не можете зафиксировать эту квартиру еще {days_left} дней из-за периода охлаждения.")
         return redirect('home')
 
     if request.method == 'POST':
@@ -140,6 +158,29 @@ def create_fixation(request, apartment_id):
             status=status,
         )
 
+        # Создаем запись истории для новой фиксации
+        history, created = FixationHistory.objects.get_or_create(fixation=fixation)
+        details = {
+            'status': fixation.status,
+            'user': request.user.username,
+            'expires_at': fixation.expires_at.isoformat() if fixation.expires_at else None,
+            'prolong_count': fixation.prolong_count,
+            'apartment': str(apartment),
+            'buyer': buyer.name,
+            'buyer_number': buyer.number
+        }
+        history.add_event('create', details)
+
+        # Обновляем долг менеджера
+        debt, created = Debt.objects.get_or_create(user=request.user, defaults={'debt_sum': 0, 'fix_amount': 0})
+        current_fix_amount = Debt.objects.filter(id=debt.id).values_list('fix_amount', flat=True).first()
+
+        if current_fix_amount is not None and current_fix_amount > 5:
+            Debt.objects.filter(id=debt.id).update(debt_sum=F('debt_sum') + 5000)
+
+        Debt.objects.filter(id=debt.id).update(fix_amount=F('fix_amount') + 1)
+
+        messages.success(request, f'Фиксация успешно создана')
         return redirect('home')
 
     return render(request, 'fixation_form.html', {'apartment': apartment})
@@ -168,12 +209,51 @@ def delete_fixation(request, fixation_id):
 @login_required
 def prolong_fixations(request, fixation_id):
     fixation = get_object_or_404(Fixation, pk=fixation_id)
-    if fixation.prolong_count >= 1:
-        messages.error(request, f'Уже продлевали, нельзя больше')
+
+    # Проверка, может ли пользователь продлить эту фиксацию
+    if request.user != fixation.user and not request.user.is_staff:
+        messages.error(request, 'У вас нет прав для продления этой фиксации')
         return redirect('all_fixations')
+
+    # Проверка на количество продлений
+    if fixation.prolong_count >= 1:
+        messages.error(request, 'Уже продлевали, нельзя больше')
+        return redirect('all_fixations')
+
+    # Проверка, активна ли фиксация
+    if fixation.status != "ACTIVE":
+        messages.error(request, 'Можно продлевать только активные фиксации')
+        return redirect('all_fixations')
+
+    # Продлеваем фиксацию
     fixation.expires_at += timezone.timedelta(days=3)
     fixation.prolong_count += 1
+
+    # Устанавливаем период охлаждения (10 дней после истечения)
+    fixation.cooling_period_end = fixation.expires_at + timezone.timedelta(days=10)
+
+    # Сохраняем изменения в фиксации
     fixation.save()
+
+    # Создаем или обновляем запись периода охлаждения
+    CoolingPeriod.objects.update_or_create(
+        user=fixation.user,
+        apartment=fixation.apartment,
+        defaults={'end_date': fixation.cooling_period_end}
+    )
+
+    # Добавляем событие в историю
+    history, created = FixationHistory.objects.get_or_create(fixation=fixation)
+    details = {
+        'status': fixation.status,
+        'user': request.user.username,
+        'expires_at': fixation.expires_at.isoformat(),
+        'prolong_count': fixation.prolong_count,
+        'cooling_period_end': fixation.cooling_period_end.isoformat()
+    }
+    history.add_event('prolong', details)
+
+    messages.success(request, f'Фиксация успешно продлена до {fixation.expires_at.strftime("%d.%m.%Y")}')
     return redirect('all_fixations')
 
 
@@ -181,3 +261,9 @@ def prolong_fixations(request, fixation_id):
 def all_fixations(request):
     fixations = Fixation.objects.all().order_by('user__username')  # Сортировка по имени менеджера
     return render(request, 'all_fixations.html', {'fixations': fixations})
+
+
+@login_required
+def get_fixation_log(request):
+    fixations = FixationHistory.objects.all()
+    return render(request, 'fixation_history.html', {'fixations': fixations})

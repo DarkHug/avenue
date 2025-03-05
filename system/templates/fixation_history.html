@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <style>
+        body {
+            background-color: #d9edf7;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .fixations-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            color: #1e2b50;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .history-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-header {
+            background: #1e2b50;
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .history-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .history-body {
+            display: none;
+            padding: 0;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 15px 0 15px 25px;
+        }
+
+        .timeline:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10px;
+            height: 100%;
+            width: 2px;
+            background-color: #dee2e6;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -18px;
+            top: 15px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            z-index: 1;
+        }
+
+        .timeline-item.create-event:before {
+            background-color: #28a745;
+        }
+
+        .timeline-item.update-event:before {
+            background-color: #ffc107;
+        }
+
+        .timeline-item.delete-event:before {
+            background-color: #dc3545;
+        }
+
+        .timeline-date {
+            display: block;
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-bottom: 3px;
+        }
+
+        .timeline-title {
+            color: #1e2b50;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .details-table {
+            width: 100%;
+            margin-top: 5px;
+            font-size: 0.8rem;
+        }
+
+        .details-table td {
+            padding: 3px 0;
+            border-bottom: 1px dotted #eee;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .details-label {
+            font-weight: 500;
+            color: #6c757d;
+            width: 40%;
+        }
+
+        .action-badge {
+            display: inline-block;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .create-badge {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .update-badge {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .delete-badge {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background-color: #1e2b50;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .back-btn:hover {
+            background-color: #354875;
+            color: white;
+        }
+
+        .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+
+        .rotate-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+
+    <div class="container fixations-container">
+        <!-- Заголовок -->
+        <h1 class="page-title">История фиксаций</h1>
+
+        <!-- Сообщения об ошибках -->
+        {% if messages %}
+            <div class="messages mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-danger alert-dismissible fade show py-2" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if fixations %}
+            {% for history in fixations %}
+                <div class="history-card">
+                    <div class="history-header" onclick="toggleHistory(this)">
+                        <div>
+                            <h3 class="history-title">
+                                {% if history.fixation %}
+                                    Фиксация #{{ history.fixation.id }} - {{ history.fixation.apartment }}
+                                {% else %}
+                                    {% with delete_event=history.history_data|dictsortreversed:"timestamp"|first %}
+                                        {% if delete_event.action == 'delete' and delete_event.details.apartment %}
+                                            Фиксация #{{ history.fixation_id_reference }} -
+                                            {{ delete_event.details.apartment }}
+                                        {% else %}
+                                            Фиксация #{{ history.fixation_id_reference }}
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
+                            </h3>
+                            <p class="history-subtitle">
+                                {% if history.fixation %}
+                                    {{ history.fixation.buyer.name }} {{ history.fixation.buyer.number }} |
+                                    {{ history.fixation.user.username }}
+                                {% else %}
+                                    {% with delete_event=history.history_data|dictsortreversed:"timestamp"|first %}
+                                        {% if delete_event.action == 'delete' %}
+                                            {% if delete_event.details.buyer_name %}
+                                                {{ delete_event.details.buyer_name }}
+                                            {% elif delete_event.details.buyer %}
+                                                {{ delete_event.details.buyer }}
+                                            {% endif %}
+
+                                            {% if delete_event.details.buyer_number %}
+                                                {{ delete_event.details.buyer_number }}
+                                            {% endif %} |
+                                            {{ delete_event.details.user }}
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="history-body">
+                        <div class="timeline">
+                            {% if history.history_data %}
+                                {% for event in history.history_data reversed %}
+                                    <div class="timeline-item {{ event.action }}-event">
+                                        <span class="timeline-date">{{ event.timestamp|date:"d.m.Y H:i" }}</span>
+                                        <h4 class="timeline-title">
+                                            {% if event.action == 'create' %}
+                                                Создание
+                                                <span class="action-badge create-badge">СОЗДАНИЕ</span>
+                                            {% elif event.action == 'update' %}
+                                                Обновление
+                                                <span class="action-badge update-badge">ОБНОВЛЕНИЕ</span>
+                                            {% elif event.action == 'delete' %}
+                                                Удаление
+                                                <span class="action-badge delete-badge">УДАЛЕНИЕ</span>
+                                            {% elif event.action == 'status_change' %}
+                                                Статус
+                                                <span class="action-badge status-badge">СТАТУС</span>
+                                            {% else %}
+                                                {{ event.action|title }}
+                                            {% endif %}
+                                        </h4>
+                                        <div class="timeline-content">
+                                            {% if event.details %}
+                                                <table class="details-table">
+                                                    {% if event.action == 'delete' and event.details.apartment %}
+                                                        <tr>
+                                                            <td class="details-label">Квартира</td>
+                                                            <td>{{ event.details.apartment }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="details-label">Покупатель</td>
+                                                            <td>
+                                                                {% if event.details.buyer_name %}
+                                                                    {{ event.details.buyer_name }}
+                                                                {% elif event.details.buyer %}
+                                                                    {{ event.details.buyer }}
+                                                                {% endif %}
+
+                                                                {% if event.details.buyer_number %}
+                                                                    ({{ event.details.buyer_number }})
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+
+                                                    {% for key, value in event.details.items %}
+                                                        {% if key != 'apartment' and key != 'buyer' and key != 'buyer_name' and key != 'buyer_number' and key != 'apartment_id' and key != 'buyer_id' %}
+                                                            <tr>
+                                                                <td class="details-label">
+                                                                    {% if key == 'status' %}
+                                                                        Статус
+                                                                    {% elif key == 'user' %}
+                                                                        Пользователь
+                                                                    {% elif key == 'expires_at' %}
+                                                                        Дата действия
+                                                                    {% elif key == 'prolong_count' %}
+                                                                        Продления
+                                                                    {% elif key == 'deleted_at' %}
+                                                                        Удалено
+                                                                    {% else %}
+                                                                        {{ key|title }}
+                                                                    {% endif %}
+                                                                </td>
+                                                                <td>
+                                                                    {% if key == 'status' %}
+                                                                        {% if value == 'ACTIVE' %}
+                                                                            <span class="action-badge create-badge">АКТИВНЫЙ</span>
+                                                                        {% elif value == 'QUEUE' %}
+                                                                            <span class="action-badge update-badge">В ОЧЕРЕДИ</span>
+                                                                        {% else %}
+                                                                            {{ value }}
+                                                                        {% endif %}
+                                                                    {% elif key == 'expires_at' %}
+                                                                        {{ event.timestamp }}
+                                                                    {% else %}
+                                                                        {{ value }}
+                                                                    {% endif %}
+                                                                </td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </table>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-3">
+                                    <p class="mb-0" style="color: #6c757d;">Нет данных</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info text-center py-2">
+                <p class="mb-0">Нет доступной истории фиксаций</p>
+            </div>
+        {% endif %}
+
+        <div class="text-center">
+            <a href="{% url 'home' %}" class="back-btn">Назад</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleHistory(header) {
+            const historyBody = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+
+            if (historyBody.style.display === 'block') {
+                historyBody.style.display = 'none';
+                toggleIcon.classList.remove('rotate-icon');
+            } else {
+                historyBody.style.display = 'block';
+                toggleIcon.classList.add('rotate-icon');
+            }
+        }
+    </script>
+{% endblock %}

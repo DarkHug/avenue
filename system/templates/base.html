@@ -53,7 +53,7 @@
 
         .logo{
             align-content: center;
-            padding-left: 200px;
+            padding-left: 400px;
         }
     </style>
 </head>
@@ -84,6 +84,7 @@
             {% else %}
                 {% if user.is_staff %}
                     <a class="nav-link mx-2" href="{% url 'all_fixations' %}">Все Фиксации</a>
+                    <a class="nav-link mx-2" href="{% url 'history_fixation' %}">История Фиксаций</a>
                     <a class="nav-link mx-2" href="{% url 'all_apartment' %}">Квартиры</a>
                 {% endif %}
                 <a class="nav-link mx-2" href="#">Профиль</a>

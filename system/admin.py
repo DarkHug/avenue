@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import Apartment, User, Buyer, Fixation
+from .models import Apartment, User, Buyer, Fixation, Debt
 
 
 # from django_apscheduler.models import DjangoJob, DjangoJobExecution
+
+admin.site.register(Debt)
 
 
 @admin.register(Fixation)

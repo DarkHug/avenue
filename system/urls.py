@@ -17,4 +17,5 @@ urlpatterns = [
     path('delete_fixation/<int:fixation_id>', views.delete_fixation, name='delete_fixation'),
     path('prolong/<int:fixation_id>', views.prolong_fixations, name='prolong_fixation'),
     path('all_fixations/', views.all_fixations, name='all_fixations'),
+    path('history_fixation/', views.get_fixation_log, name='history_fixation'),
 ]
