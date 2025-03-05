@@ -125,6 +125,14 @@
             min-width: fit-content;
         }
 
+        @media (max-width: 991px) {
+            .table-container {
+                display: block;
+                width: 100%;
+                min-width: auto;
+            }
+        }
+
         .badge-area {
             font-weight: 600;
             border-radius: 4px;
@@ -177,14 +185,14 @@
                 min-width: 100%;
             }
 
-            /* Скрыть таблицу на мобильных */
-            .desktop-table {
-                display: none;
+            /* Медиа-запросы могут не всегда переопределять классы Bootstrap,
+               поэтому добавляем больший вес селекторам */
+            body .desktop-table {
+                display: none !important;
             }
 
-            /* Показать карточки на мобильных */
-            .mobile-cards {
-                display: block;
+            body .mobile-cards {
+                display: block !important;
             }
 
             .apartment-card {
@@ -266,7 +274,7 @@
 
         <div class="table-container" style="margin: 0 auto; text-align: left;">
             <!-- Десктопная версия (таблица) -->
-            <div class="table-responsive desktop-table d-none d-lg-block">
+            <div class="table-responsive desktop-table d-lg-block d-none">
                 <table class="table custom-table">
                     <thead>
                     <tr>
@@ -331,7 +339,7 @@
             </div>
 
             <!-- Мобильная версия (карточки) -->
-            <div class="mobile-cards d-block d-lg-none">
+            <div class="mobile-cards d-lg-none d-block">
                 {% for apartment in apartments %}
                     <div class="apartment-card">
                         <div class="apartment-card-header">
