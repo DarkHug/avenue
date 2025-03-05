@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <style>
+        body {
+            background-color: #d9edf7;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .debt-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            margin: 25px auto;
+            max-width: 600px;
+        }
+
+        .page-title {
+            color: #1e2b50;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .debt-item {
+            background-color: #f8f9fa;
+            border-left: 3px solid #0d6efd;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-name {
+            color: #1e2b50;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .debt-sum {
+            font-size: 1rem;
+            color: #dc3545; /* Красный цвет для долга */
+            font-weight: 500;
+        }
+    </style>
+
+    <div class="container debt-container">
+        <!-- Заголовок -->
+        <h1 class="page-title">Долги менеджеров</h1>
+
+        <!-- Список пользователей и их долгов -->
+        {% for debt in debt_sum %}
+            <div class="debt-item">
+                <span class="user-name">{{ debt.user }}</span>
+                <span class="debt-sum">Долг: {{ debt.debt_sum }}</span>
+            </div>
+        {% empty %}
+            <div class="alert alert-info text-center py-2">
+                <p class="mb-0">Нет данных о долгах.</p>
+            </div>
+        {% endfor %}
+        <div class="container">
+            <a href="{% url 'delete_debt' %}" class="btn btn-danger">Обнулить</a>
+        </div>
+
+    </div>
+{% endblock %}

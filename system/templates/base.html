@@ -1,12 +1,19 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-..." crossorigin="anonymous"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap');
 
@@ -14,16 +21,17 @@
             font-family: 'Montserrat', sans-serif;
         }
 
+        /* Основные стили навигационной панели */
         .navbar-custom {
-            background-color: #1e2b50 !important; /* Dark blue color as seen in the image */
+            background-color: #1e2b50 !important;
             color: white;
             padding: 12px 0;
         }
 
-        .navbar-custom .nav-link, .navbar-brand {
+        .navbar-custom .nav-link,
+        .navbar-custom .navbar-brand {
             color: white !important;
             font-weight: 500;
-            padding: 0 18px;
             letter-spacing: 0px;
         }
 
@@ -31,14 +39,51 @@
             color: rgba(255, 255, 255, 0.85) !important;
         }
 
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            flex-grow: 1;
+        /* Стили для мобильной версии */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .navbar-nav {
+                text-align: center;
+                padding: 15px 0;
+            }
+
+            .logo-container {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            .navbar-nav .nav-link {
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .exit-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .container-fluid {
+                padding: 0 15px;
+            }
         }
 
-        .container-fluid {
-            padding: 0 30px;
+        /* Стили для десктопа */
+        @media (min-width: 992px) {
+            .logo-container {
+                display: flex;
+                justify-content: center;
+                flex-grow: 1;
+            }
+
+            .container-fluid {
+                padding: 0 30px;
+            }
         }
 
         .exit-btn {
@@ -51,50 +96,68 @@
             display: inline-block;
         }
 
-        .logo{
-            align-content: center;
-            padding-left: 400px;
+        /* Логотип */
+        .logo img {
+            max-height: 30px;
+            max-width: 100%;
         }
     </style>
 </head>
 <body>
-<!-- Dark blue navbar matching the image -->
+<!-- Навигационная панель с поддержкой мобильных устройств -->
 <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
     <div class="container-fluid">
-        <!-- Left navigation items -->
-        <div class="navbar-nav me-auto">
-            <a class="nav-link mx-2" href="{% url 'home' %}">Главная</a>
-            {% if user.is_authenticated %}
-                <a class="nav-link mx-2" href="{% url 'my_fixations' %}">Мои Фиксации</a>
-            {% endif %}
-        </div>
+        <!-- Кнопка-гамбургер для мобильных устройств -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="Переключить навигацию">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <!-- Center logo -->
-        <div class="logo-container ">
+        <!-- Логотип для мобильных устройств -->
+        <div class="logo-container d-lg-none">
             <a class="logo" href="#">
-                <img src="{% static 'logo.png' %}" alt="Logo" height="30">
+                <img src="{% static 'logo.png' %}" alt="Logo">
             </a>
         </div>
 
-        <!-- Right navigation items -->
-        <div class="navbar-nav ms-auto">
-            {% if not user.is_authenticated %}
-                <a class="nav-link mx-2" href="{% url 'signup' %}">Зарегистрироваться</a>
-                <a class="nav-link mx-2" href="{% url 'login' %}">Логин</a>
-            {% else %}
-                {% if user.is_staff %}
-                    <a class="nav-link mx-2" href="{% url 'all_fixations' %}">Все Фиксации</a>
-                    <a class="nav-link mx-2" href="{% url 'history_fixation' %}">История Фиксаций</a>
-                    <a class="nav-link mx-2" href="{% url 'all_apartment' %}">Квартиры</a>
+        <!-- Контейнер для навигационного меню -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Левая часть навигации -->
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="{% url 'home' %}">Главная</a>
+                {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'my_fixations' %}">Мои Фиксации</a>
                 {% endif %}
-                <a class="nav-link mx-2" href="#">Профиль</a>
-                <form action="{% url 'logout' %}" method="post" class="d-flex align-items-center ms-3">
-                    {% csrf_token %}
-                    <u>
-                        <button type="submit" class="exit-btn mx-2">Выйти</button>
-                    </u>
-                </form>
-            {% endif %}
+            </div>
+
+            <!-- Логотип для десктопа -->
+            <div class="logo-container d-none d-lg-flex">
+                <a class="logo" href="#">
+                    <img src="{% static 'logo.png' %}" alt="Logo">
+                </a>
+            </div>
+
+            <!-- Правая часть навигации -->
+            <div class="navbar-nav ms-auto">
+                {% if not user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'signup' %}">Зарегистрироваться</a>
+                    <a class="nav-link" href="{% url 'login' %}">Логин</a>
+                {% else %}
+                    {% if user.is_staff %}
+                        <a class="nav-link" href="{% url 'all_fixations' %}">Все Фиксации</a>
+                        <a class="nav-link" href="{% url 'history_fixation' %}">История Фиксаций</a>
+                        <a class="nav-link" href="{% url 'all_apartment' %}">Квартиры</a>
+                        <a class="nav-link" href="{% url 'user_debt' %}">Долги</a>
+                    {% endif %}
+                    <form action="{% url 'logout' %}" method="post" class="d-flex align-items-center">
+                        {% csrf_token %}
+                        <u>
+                            <button type="submit" class="exit-btn mx-2">Выйти</button>
+                        </u>
+                    </form>
+                {% endif %}
+            </div>
         </div>
     </div>
 </nav>

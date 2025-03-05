@@ -13,9 +13,20 @@ from .models import Apartment, Fixation, FixationHistory, Buyer, Debt, CoolingPe
 # ---------------------Login & Profile Section---------------------
 
 @login_required
-def profile(request):
-    user = request.user
-    pass
+def user_debt(request):
+    debt_sum = Debt.objects.all()
+
+    if debt_sum is None:
+        debt_sum = 0
+
+    return render(request, 'user_debt.html', context={'debt_sum': debt_sum})
+
+
+@login_required
+def delete_all_debt(request):
+    debt_sum = Debt.objects.all()
+    debt_sum.delete()
+    return redirect('user_debt')
 
 
 def signup_view(request):
@@ -148,7 +159,7 @@ def create_fixation(request, apartment_id):
 
         active_fixations_count = apartment.fixations.filter(status="ACTIVE").count()
 
-        if active_fixations_count >= 3:
+        if active_fixations_count >= 5:
             status = "QUEUE"
 
         fixation = Fixation.objects.create(
