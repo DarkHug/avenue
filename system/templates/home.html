@@ -292,7 +292,7 @@
                             <td>{{ apartment.floor }} из {{ apartment.max_floor }}</td>
                             <td>{{ apartment.block }}</td>
                             <td>{{ apartment.status }}</td>
-                            <td><span class="badge-finish">{{ apartment.completion|date:"Y" }}</span></td>
+                            <td><span class="badge-finish">{{ apartment.completion }}</span></td>
                             <td class="price-column" style="white-space: nowrap;">
                                 {% with price_str=apartment.price|stringformat:"s" %}
                                     {% if price_str|length > 9 %}
@@ -357,7 +357,7 @@
                             </div>
                             <div class="apartment-card-item">
                                 <span class="apartment-card-label">Сдача</span>
-                                <span class="apartment-card-value badge-finish">{{ apartment.completion|date:"Y" }}</span>
+                                <span class="apartment-card-value badge-finish">{{ apartment.completion }}</span>
                             </div>
                             <div class="apartment-card-item">
                                 <span class="apartment-card-label">Окна</span>
