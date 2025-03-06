@@ -27,7 +27,7 @@
                             <div class="form-group">
                                 <label for="buyer_number">Номер телефона:</label>
                                 <input type="tel" class="form-control" id="buyer_number" name="buyer_number" required
-                                       placeholder="+7xxxxxxxxx" pattern="+[0-9]{10}">
+                                       placeholder="+7XXXXXXXXXX" pattern="^\+7[0-9]{10}$">
                             </div>
                             <!-- Добавляем отступ над кнопкой -->
                             <div class="mt-4 text-center">
@@ -39,4 +39,52 @@
             </div>
         </div>
     </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var phoneInput = document.getElementById('buyer_number');
+
+        // Устанавливаем "+7" при фокусе на пустом поле
+        phoneInput.addEventListener('focus', function(e) {
+          if (!e.target.value) {
+            e.target.value = '+7';
+          }
+        });
+
+        // Обрабатываем ввод в поле
+        phoneInput.addEventListener('input', function(e) {
+          // Получаем текущее значение
+          let value = e.target.value;
+
+          // Если поле пустое, добавляем "+7"
+          if (value === '') {
+            e.target.value = '+7';
+            return;
+          }
+
+          // Если префикс не "+7", исправляем его
+          if (!value.startsWith('+7')) {
+            // Удаляем все нецифровые символы и любые префиксы +/7
+            const digits = value.replace(/\D/g, '').replace(/^7/, '');
+            e.target.value = '+7' + digits;
+          }
+
+          // Ограничиваем длину до +7 и 10 цифр
+          if (value.length > 12) {
+            e.target.value = value.substring(0, 12);
+          }
+        });
+
+        // Проверяем форму перед отправкой
+        document.querySelector('form').addEventListener('submit', function(e) {
+          const value = phoneInput.value;
+          // Проверяем, что номер начинается с +7 и содержит 10 цифр после него
+          if (!value.match(/^\+7\d{10}$/)) {
+            e.preventDefault();
+            alert('Пожалуйста, введите корректный номер телефона в формате +7XXXXXXXXXX');
+            phoneInput.focus();
+          }
+        });
+      });
+    </script>
 {% endblock %}
