@@ -140,7 +140,25 @@ def create_fixation(request, apartment_id):
         buyer_name = request.POST.get('buyer_name')
         buyer_number = request.POST.get('buyer_number')
 
-        # Проверяем, существует ли такой покупатель
+        # Нормализуем номер телефона для единообразия формата
+        # Убедимся, что номер начинается с +7 и имеет правильный формат
+        if not buyer_number.startswith('+7'):
+            buyer_number = '+7' + buyer_number.lstrip('+').lstrip('7')
+
+        # Очищаем номер от всех символов кроме цифр и '+'
+        clean_number = ''.join(c for c in buyer_number if c.isdigit() or c == '+')
+
+        # Убеждаемся, что номер начинается с +7
+        if clean_number.startswith('7'):
+            clean_number = '+' + clean_number
+        elif not clean_number.startswith('+'):
+            clean_number = '+7' + clean_number
+        elif not clean_number.startswith('+7'):
+            clean_number = '+7' + clean_number[1:]
+
+        buyer_number = clean_number
+
+        # Проверяем, существует ли такой покупатель с нормализованным номером
         existing_buyer = Buyer.objects.filter(number=buyer_number).first()
 
         # Если покупатель существует, проверяем, есть ли уже фиксация с этим покупателем на данную квартиру
